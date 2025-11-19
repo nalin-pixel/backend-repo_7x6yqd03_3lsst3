@@ -12,9 +12,9 @@ Model name is converted to lowercase for the collection name:
 """
 
 from pydantic import BaseModel, Field
-from typing import Optional
+from typing import Optional, Literal
 
-# Example schemas (replace with your own):
+# Example schemas (you may keep these for reference)
 
 class User(BaseModel):
     """
@@ -31,18 +31,28 @@ class Product(BaseModel):
     """
     Products collection schema
     Collection name: "product" (lowercase of class name)
+
+    Used for: Verkoop & Onderdelen
     """
     title: str = Field(..., description="Product title")
-    description: Optional[str] = Field(None, description="Product description")
-    price: float = Field(..., ge=0, description="Price in dollars")
-    category: str = Field(..., description="Product category")
-    in_stock: bool = Field(True, description="Whether product is in stock")
+    description: Optional[str] = Field(None, description="Short description / state")
+    category: Literal['Auto', 'Landbouw', 'Diversen'] = Field('Diversen', description="Product category")
+    price: Optional[float] = Field(None, ge=0, description="Optional fixed price; if None, price on request")
+    condition: Optional[str] = Field(None, description="State/Condition e.g. Nieuw, Gebruikt, Dealer onderhouden")
+    image_url: Optional[str] = Field(None, description="Public image URL for the product card")
 
-# Add your own schemas here:
-# --------------------------------------------------
+class Appointment(BaseModel):
+    """
+    Appointment requests
+    Collection name: "appointment"
 
-# Note: The Flames database viewer will automatically:
-# 1. Read these schemas from GET /schema endpoint
-# 2. Use them for document validation when creating/editing
-# 3. Handle all database operations (CRUD) directly
-# 4. You don't need to create any database endpoints!
+    Used for: Contact & Afspraak formulier
+    """
+    name: str = Field(..., min_length=2, description="Naam klant")
+    phone: str = Field(..., min_length=6, description="Telefoonnummer")
+    email: Optional[str] = Field(None, description="E-mailadres")
+    service_type: Literal['APK', 'Auto onderhoud', 'Diagnose', 'Tractorreparatie', 'Hydrauliek', 'Onderhoud op locatie', 'Overig'] = 'Overig'
+    preferred_date: Optional[str] = Field(None, description="Voorkeursdatum (tekst)")
+    message: Optional[str] = Field(None, description="Korte toelichting of kenteken")
+
+# Add your own schemas here if needed.
